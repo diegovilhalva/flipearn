@@ -1,8 +1,29 @@
-
+import { Route, Routes } from "react-router-dom"
+import Home from "./pages/Home"
+import Marketplace from "./pages/Marketplace"
+import MyListings from "./pages/MyListings"
+import ListingDetails from "./pages/ListingDetails"
+import ManageListing from "./pages/ManageListing"
+import Message from "./pages/Message"
+import MyOrders from "./pages/MyOrders"
+import Loading from "./pages/Loading"
 
 const App = () => {
   return (
-    <div className="bg-black/80 text-white h-screen flex items-center justify-center" >App</div>
+    <div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/my-listings" element={<MyListings />} />
+        <Route path="/listing/:listingId" element={<ListingDetails />} />
+        <Route path="/create-listing"  element={<ManageListing />} />
+        <Route path="/edit-listing/:id" element={<ManageListing />} />
+        <Route path="/messages" element={<Message />} />
+        <Route path="/my-orders" element={<MyOrders />} />
+        <Route path="/loading" element={<Loading />} />
+        
+      </Routes>
+    </div>
   )
 }
 
