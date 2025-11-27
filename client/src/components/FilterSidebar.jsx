@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 const FilterSidebar = ({ showFilterPhone, setShowFilterPhone, filters, setFilters }) => {
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
-    const currency = import.meta.env.VITE_CURRENCY || "$" 
+    const currency = import.meta.env.VITE_CURRENCY || "$"
     const [search, setSearch] = useState(searchParams.get("search") || "")
 
     const onChangeSearch = (e) => {
@@ -46,6 +46,16 @@ const FilterSidebar = ({ showFilterPhone, setShowFilterPhone, filters, setFilter
         { value: "linkedin", label: "LinkedIn" },
         { value: "twitch", label: "Twitch" },
         { value: "discord", label: "Discord" }
+    ]
+
+    const niches = [
+        { value: "lifestyle", label: "Lifestyle" },
+        { value: "fitness", label: "Fitness" },
+        { value: "food", label: "Food" },
+        { value: "travel", label: "Travel" },
+        { value: "tech", label: "Tech" },
+        { value: "gaming", label: "Gaming" },
+        
     ]
     return (
         <div className={`${showFilterPhone ? "max-sm:fixed" : "max-sm:hidden"} max-sm:inset-0 z-100 max-sm:h-screen max-sm:overflow-scroll bg-white rounded-lg shadow-sm border border-gray-200 h-fit sticky top-24 md:min-w-[300px]`}>
@@ -96,12 +106,46 @@ const FilterSidebar = ({ showFilterPhone, setShowFilterPhone, filters, setFilter
                     </button>
                     {expandedSections.price && (
                         <div className="space-y-3">
-                            <input type="range" min='0' max="100000" step="100" value={filters.maxPrice  || 1000000} onChange={(e) => onFilterChange({...filters,maxPrice:parseInt(e.target.value)})} className="w-full  h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"/>
+                            <input type="range" min='0' max="100000" step="100" value={filters.maxPrice || 1000000} onChange={(e) => onFilterChange({ ...filters, maxPrice: parseInt(e.target.value) })} className="w-full  h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
                             <div className="flex items-center justify-between text-sm text-gray-600">
-                                    <span>{currency}0</span>
-                                    <span>{currency}{(filters.maxPrice || 100000).toLocaleString()}</span>
+                                <span>{currency}0</span>
+                                <span>{currency}{(filters.maxPrice || 100000).toLocaleString()}</span>
                             </div>
                         </div>
+                    )}
+                </div>
+                <div >
+                    <button onClick={() => toggleSection("followers")} className="flex items-center justify-between w-full mb-3">
+                        <label htmlFor="" className="text-sm font-medium text-gray-800">Minimum Followers</label>
+                        <ChevronDown className={`size-4 transition-transform ${expandedSections.followers ? "rotate-180" : ""}`} />
+                    </button>
+                    {expandedSections.followers && (
+                        <select value={filters.minFollowers?.toString() || "0"} onClick={(e) => onFilterChange({ ...filters, minFollowers: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 outline-indigo-500">
+                            <option value="0">Any amount</option>
+                            <option value="1000">1K+</option>
+                            <option value="10000">10K+</option>
+                            <option value="50000">50K+</option>
+                            <option value="100000">100K+</option>
+                            <option value="500000">500K+</option>
+                            <option value="1000000">1M+</option>
+                        </select>
+                    )}
+                </div>
+                <div >
+                    <button onClick={() => toggleSection("niche")} className="flex items-center justify-between w-full mb-3">
+                        <label htmlFor="" className="text-sm font-medium text-gray-800">Niche</label>
+                        <ChevronDown className={`size-4 transition-transform ${expandedSections.niche ? "rotate-180" : ""}`} />
+                    </button>
+                    {expandedSections.niche && (
+                        <select value={filters.niche || ""} onClick={(e) => onFilterChange({ ...filters, niche: e.target.value || null })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 outline-indigo-500">
+                            <option value="0">Any amount</option>
+                            <option value="1000">1K+</option>
+                            <option value="10000">10K+</option>
+                            <option value="50000">50K+</option>
+                            <option value="100000">100K+</option>
+                            <option value="500000">500K+</option>
+                            <option value="1000000">1M+</option>
+                        </select>
                     )}
                 </div>
             </div>
