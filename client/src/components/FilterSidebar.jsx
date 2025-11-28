@@ -37,6 +37,20 @@ const FilterSidebar = ({ showFilterPhone, setShowFilterPhone, filters, setFilter
         setFilters({ ...filters, ...newFilters })
     }
 
+    const onClearFilters = () => {
+        if (search) {
+            navigate("/marketplace")
+        }
+        setFilters({
+            platform:null,
+            maxPrice:100000,
+            minFollowers:0,
+            niche:null,
+            verified:false,
+            monetized:false
+        })
+    }
+
     const platforms = [
         { value: "youtube", label: "YouTube" },
         { value: "instagram", label: "Instagram" },
@@ -55,7 +69,16 @@ const FilterSidebar = ({ showFilterPhone, setShowFilterPhone, filters, setFilter
         { value: "travel", label: "Travel" },
         { value: "tech", label: "Tech" },
         { value: "gaming", label: "Gaming" },
-        
+        { value: "fashion", label: "Fashion" },
+        { value: "business", label: "Business" },
+        { value: "beauty", label: "Beauty" },
+        { value: "education", label: "Education" },
+        { value: "entertainment", label: "Entertaiment" },
+        { value: "music", label: "Music" },
+        { value: "art", label: "Art" },
+        { value: "sports", label: "Sports" },
+        { value: "health", label: "Health" },
+        { value: "finance", label: "Finance" }
     ]
     return (
         <div className={`${showFilterPhone ? "max-sm:fixed" : "max-sm:hidden"} max-sm:inset-0 z-100 max-sm:h-screen max-sm:overflow-scroll bg-white rounded-lg shadow-sm border border-gray-200 h-fit sticky top-24 md:min-w-[300px]`}>
@@ -66,7 +89,7 @@ const FilterSidebar = ({ showFilterPhone, setShowFilterPhone, filters, setFilter
                         <h3 className="font-semibold">Filters</h3>
                     </div>
                     <div className="flex items-centr gap-2">
-                        <X className="size-6 text-gray-500 hover:text-gray-700 p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer" />
+                        <X className="size-6 text-gray-500 hover:text-gray-700 p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer" onClick={onClearFilters} />
                         <button onClick={() => setShowFilterPhone(false)} className="sm:hidden text-sm border text-gray-700 px-3 py-1 rounded">Apply</button>
                     </div>
                 </div>
@@ -120,7 +143,7 @@ const FilterSidebar = ({ showFilterPhone, setShowFilterPhone, filters, setFilter
                         <ChevronDown className={`size-4 transition-transform ${expandedSections.followers ? "rotate-180" : ""}`} />
                     </button>
                     {expandedSections.followers && (
-                        <select value={filters.minFollowers?.toString() || "0"} onClick={(e) => onFilterChange({ ...filters, minFollowers: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 outline-indigo-500">
+                        <select value={filters.minFollowers?.toString() || "0"} onChange={(e) => onFilterChange({ ...filters, minFollowers: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 outline-indigo-500">
                             <option value="0">Any amount</option>
                             <option value="1000">1K+</option>
                             <option value="10000">10K+</option>
@@ -137,15 +160,33 @@ const FilterSidebar = ({ showFilterPhone, setShowFilterPhone, filters, setFilter
                         <ChevronDown className={`size-4 transition-transform ${expandedSections.niche ? "rotate-180" : ""}`} />
                     </button>
                     {expandedSections.niche && (
-                        <select value={filters.niche || ""} onClick={(e) => onFilterChange({ ...filters, niche: e.target.value || null })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 outline-indigo-500">
-                            <option value="0">Any amount</option>
-                            <option value="1000">1K+</option>
-                            <option value="10000">10K+</option>
-                            <option value="50000">50K+</option>
-                            <option value="100000">100K+</option>
-                            <option value="500000">500K+</option>
-                            <option value="1000000">1M+</option>
+                        <select value={filters.niche || ""} onChange={(e) => onFilterChange({ ...filters, niche: e.target.value || null })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 outline-indigo-500">
+                            <option value="">All Niches</option>
+                            {niches.map((niche) => (
+                                <option value={niche.value} key={niche.value}>{niche.label}</option>
+                            ))}
                         </select>
+                    )}
+                </div>
+
+                <div >
+                    <button onClick={() => toggleSection("status")} className="flex items-center justify-between w-full mb-3">
+                        <label htmlFor="" className="text-sm font-medium text-gray-800">Account Status</label>
+                        <ChevronDown className={`size-4 transition-transform ${expandedSections.status ? "rotate-180" : ""}`} />
+                    </button>
+                    {expandedSections.status && (
+                        <div className="space-y-3">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" checked={filters.verified || false}
+                                    onChange={(e) => onFilterChange({ ...filters, verified: e.target.checked })} />
+                                <span className="text-sm text-gray-700">Verified accounts only</span>
+                            </label>
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" checked={filters.monetized || false}
+                                    onChange={(e) => onFilterChange({ ...filters, monetized: e.target.checked })} />
+                                <span className="text-sm text-gray-700">Monetized accounts only</span>
+                            </label>
+                        </div>
                     )}
                 </div>
             </div>
