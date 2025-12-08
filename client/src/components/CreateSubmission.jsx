@@ -27,7 +27,7 @@ const CreateSubmission = ({ onClose, listing }) => {
             <div className="bg-white sm:rounded-lg shadow-2xl w-full max-w-lg h-screen  sm:h-[320px] flex flex-col ">
                 <div className="bg-linear-to-r from-indigo-600 to-indigo-400 text-white p-4 sm:rounded-t-lg flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                        <h3 class>{listing?.title}</h3>
+                        <h3>{listing?.title}</h3>
                         <p>Adding Credentials for {listing?.username} on {listing?.platform}</p>
                     </div>
                     <button onClick={onClose} className="ml-4 p-1 hover:bg-white/20 hover:bg-opacity-20 rounded-lg transition-colors">
