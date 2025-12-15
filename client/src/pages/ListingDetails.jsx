@@ -5,9 +5,11 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { ArrowLeftIcon, ArrowUpRightFromSquareIcon, Calendar, CheckCircle2, ChevronLeftIcon, ChevronRightIcon, DollarSign, Eye, LineChart, Loader2Icon, MapPin, MessageSquareMoreIcon, ShoppingBagIcon, Users } from "lucide-react"
 import { setChat } from "../app/features/chatSlice"
+import { useUser } from "@clerk/clerk-react"
+import toast from "react-hot-toast"
 
 const ListingDetails = () => {
-
+  const { user, isLoaded } = useUser()
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const currency = import.meta.env.VITE_CURRENCY || "$"
@@ -23,10 +25,13 @@ const ListingDetails = () => {
   const nextSlide = () => setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1))
 
   const purchaseAccount = async () => {
+
     // to do when backend part starts
   }
 
   const loadChatbox = async () => {
+    if (!isLoaded || !user) return toast("Please login to chat with seller")
+    if (user.id === listing.ownerId) return toast("You can't chat with your own listing")
     dispatch(setChat({ listing: listing }))
   }
 
