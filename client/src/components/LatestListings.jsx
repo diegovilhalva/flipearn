@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 const LatestListings = () => {
 
     const { listings } = useSelector(state => state.listing)
+    console.log(listings)
     return (
         <div className="mt-20 mb-8">
             <Title title={"Latest Listings"} description={"Discover the hottest social profiles available right now."} />

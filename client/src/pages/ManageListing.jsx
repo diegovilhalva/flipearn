@@ -1,13 +1,20 @@
+import { useAuth } from "@clerk/clerk-react"
 import { Loader2Icon, Upload } from "lucide-react"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
+import api from "../configs/axios"
+import { getAllPublicListing, getAllUserListing } from "../app/features/listingSlice"
 
 const ManageListing = () => {
     const { id } = useParams()
     const navigate = useNavigate()
     const { userListings } = useSelector((state) => state.listing)
+
+    const { getToken } = useAuth()
+    const dispatch = useDispatch()
+
 
     const [loadingListing, setLoadingListing] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
@@ -73,8 +80,47 @@ const ManageListing = () => {
         }
     }, [id])
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
+        const token = await getToken()
+        toast.loading("Saving...")
+        const dataCopy = structuredClone(formData)
+
+        try {
+            if (isEditing) {
+                dataCopy.images.filter((image) => typeof image === "string")
+                const formDataInstance = new FormData()
+                formDataInstance.append("accountDetails", JSON.stringify(dataCopy))
+                formData.images.filter((image) => typeof image !== "string").forEach((image) => { formDataInstance.append("images", image) })
+
+                const token = await getToken()
+
+                const { data } = await api.put("/api/listing", formDataInstance, { headers: { Authorization: `Bearer ${token}` } })
+                toast.dismissAll()
+                toast.success(data.message)
+                dispatch(getAllUserListing({ getToken }))
+
+                dispatch(getAllPublicListing())
+                navigate("my-listings")
+            } else {
+                delete dataCopy.images
+                const formDataInstance = new FormData()
+                formDataInstance.append("accountDetails", JSON.stringify(dataCopy))
+                formData.images.forEach((image) => {
+                    formDataInstance.append("images", image)
+                })
+
+                const { data } = await api.post("/api/listing", formDataInstance, { headers: { Authorization: `Bearer ${token}` } })
+                toast.dismissAll()
+                toast.success(data.message)
+                dispatch(getAllUserListing({ getToken }))
+                dispatch(getAllPublicListing())
+                navigate("/my-listings")
+            }
+        } catch (error) {
+            toast.dismissAll()
+            toast.error(error?.response?.data?.message || error.message)
+        }
     }
 
     if (loadingListing) {
@@ -127,17 +173,17 @@ const ManageListing = () => {
                     </Section>
                     <Section title="Screenshots & Proof">
                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                            <input type="file" id="images" multiple  accept="image/*"  
-                            onChange={handleImageUpload} className="hidden" />
+                            <input type="file" id="images" multiple accept="image/*"
+                                onChange={handleImageUpload} className="hidden" />
                             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                             <label htmlFor="images" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">Choose Files</label>
                             <p className="text-sm text-gray-500 mt-2">Upload screenshots or proof of account analytics</p>
                         </div>
                         {formData.images.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                                {formData.images.map((image,index) => (
+                                {formData.images.map((image, index) => (
                                     <div className="relative" key={index}>
-                                        <img src={typeof image ==="string" ? image : URL.createObjectURL(image)} alt={`image ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                                        <img src={typeof image === "string" ? image : URL.createObjectURL(image)} alt={`image ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
                                         <button type="button" onClick={() => removeImage(index)} className="absolute -top-2 -right-2 size-6 bg-red-600 text-white rounded-full hover:bg-red-700">
                                             x
                                         </button>
@@ -151,7 +197,7 @@ const ManageListing = () => {
                             Cancel
                         </button>
                         <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-                            {isEditing ? 'Update Listing': 'Create Listing'}
+                            {isEditing ? 'Update Listing' : 'Create Listing'}
                         </button>
                     </div>
                 </form>

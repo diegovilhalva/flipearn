@@ -17,14 +17,33 @@ import AllListings from "./pages/admin/AllListings"
 import Transactions from "./pages/admin/Transactions"
 import Withdrawal from "./pages/admin/Withdrawal"
 import { Toaster } from "react-hot-toast"
+import { useAuth, useUser } from "@clerk/clerk-react"
+import { useDispatch } from "react-redux"
+import { useEffect } from "react"
+import { getAllPublicListing, getAllUserListing } from "./app/features/listingSlice"
 
 const App = () => {
-  const {pathname} = useLocation()
+  const { pathname } = useLocation()
+  const { getToken } = useAuth()
+  const { user, isLoaded } = useUser()
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getAllPublicListing())
+  },[])
+
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      dispatch(getAllUserListing({getToken}))
+    }
+  },[isLoaded,user])
   return (
     <div>
-      <Toaster/>
-      {!pathname.includes('/admin') && <Navbar /> }
-      
+      <Toaster />
+      {!pathname.includes('/admin') && <Navbar />}
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/marketplace" element={<Marketplace />} />
