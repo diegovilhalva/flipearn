@@ -4,12 +4,17 @@ import toast from 'react-hot-toast';
 import { ArrowUpRightFromSquareIcon, CopyIcon, Loader2Icon, XIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { dummyOrders, getProfileLink } from '../../assets/assets';
+import { useAuth } from '@clerk/clerk-react';
+import api from '../../configs/axios';
 
 const CredentialVerifyModal = ({ listing, onClose }) => {
+
+    const { getToken } = useAuth()
 
     const [loading, setLoading] = useState(true);
     const [credential, setCredential] = useState(null);
     const [isVerified, setIsVerified] = useState(false);
+
 
     const profileLink = getProfileLink(listing.platform, listing.username);
 
@@ -19,12 +24,28 @@ const CredentialVerifyModal = ({ listing, onClose }) => {
     };
 
     const fetchCredential = async () => {
-        setCredential(dummyOrders[0].credential)
-        setLoading(false);
+        try {
+            const token = await getToken()
+            const { data } = await api.get(`/api/admin/credential/${listing.id}`, { headers: { Authorization: `Bearer ${token}` } })
+            setCredential(data.credential)
+        } catch (error) {
+            console.log(error)
+            toast.error(error?.response?.data?.message || error.message)
+        }finally{
+            setLoading(false)
+        }
     };
 
     const verifyCredential = async () => {
-
+        try {
+            const token = await getToken()
+            const {data} = await api.put(`/api/admin/verify-credential/${listing.id}`,{},{headers:{Authorization:`Bearer ${token}`}})
+            toast.success(data.message)
+            onClose()
+        } catch (error) {
+            console.log(error)
+            toast.error(error?.response?.data?.message || error.message) 
+        }
     };
 
     useEffect(() => {

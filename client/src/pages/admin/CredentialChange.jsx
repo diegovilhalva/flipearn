@@ -4,16 +4,30 @@ import { useState } from 'react';
 import { Loader2Icon } from 'lucide-react';
 import CredentialChangeModal from '../../components/admin/CredentialChangeModal';
 import { dummyListings } from '../../assets/assets';
+import { useAuth } from '@clerk/clerk-react';
+import api from '../../configs/axios';
+import toast from 'react-hot-toast';
 
 const CredentialChange = () => {
-
+    const { getToken } = useAuth()
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(null);
 
+
     const fetchAllUnchangedListings = async () => {
-        setListings(dummyListings);
-        setLoading(false);
+        try {
+            const token = await getToken()
+            const { data } = await api.get("/api/admin/unchanged-listings", {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            setListings(data.listings)
+        } catch (error) {
+            console.log(error)
+            toast.error(error?.response?.data?.message || error.message)
+        } finally {
+            setLoading(false)
+        }
     };
 
     useEffect(() => {

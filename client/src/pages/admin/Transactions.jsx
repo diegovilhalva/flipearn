@@ -4,17 +4,30 @@ import { useEffect } from 'react';
 import ListingDetailsModal from '../../components/admin/ListingDetailsModal';
 import { Loader2Icon } from 'lucide-react';
 import { dummyOrders } from '../../assets/assets';
+import toast from 'react-hot-toast';
+import { useAuth } from '@clerk/clerk-react';
+import api from '../../configs/axios';
 
 const Transactions = () => {
+    const { getToken } = useAuth()
     const currency = import.meta.env.VITE_CURRENCY || '$';
-
     const [trasactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(null);
 
     const getTransactions = async () => {
-        setTransactions(dummyOrders);
-        setLoading(false);
+        try {
+            const token = await getToken()
+            const { data } = await api.get("/api/admin/transactions", { headers: { Authorization: `Bearer ${token}` } })
+           
+            setTransactions(data.transactions)
+
+        } catch (error) {
+            console.log(error)
+            toast.error(error?.response?.data?.message || error.message)
+        } finally {
+            setLoading(false)
+        }
     };
 
     useEffect(() => {
