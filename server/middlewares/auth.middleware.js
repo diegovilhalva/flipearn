@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { clerkClient } from "@clerk/express"
 
 
@@ -21,12 +22,13 @@ export const protect = async (req, res, next) => {
 
 export const protectAdmin = async (req, res, next) => {
     try {
-        const { user } = await clerkClient.users.getOrganizationMembershipList(await req.auth().userId)
+        const { userId } = await req.auth()
        
-        const isAdmin = protect.env.ADMIN_EMAILS.split(",").includes(user.emailAddresses[0].emailAddress)
-
+        const user  = await clerkClient.users.getUser(userId)
+       
+        const isAdmin = process.env.ADMIN_EMAILS.split(",").includes(user.emailAddresses[0].emailAddress)
         if (!isAdmin) {
-            return res.status(401).json({message:"Unauthorized"})
+            return res.status(401).json({ message: "Unauthorized" })
         }
         return next()
     } catch (error) {

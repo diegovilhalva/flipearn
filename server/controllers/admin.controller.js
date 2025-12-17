@@ -25,7 +25,7 @@ export const getDashboard = async (req, res) => {
             where: { status: "active" }
         })
 
-        const totaluser = await prisma.user.count({})
+        const totalUser = await prisma.user.count({})
 
         const recentListings = await prisma.listing.findMany({
             orderBy: { createdAt: "desc" },
@@ -34,7 +34,7 @@ export const getDashboard = async (req, res) => {
         })
 
 
-        return res.json({ dashboardData: { totalListings, totalRevenue, totaluser, activeListings, recentListings } })
+        return res.json({ dashboardData: { totalListings, totalRevenue, totalUser, activeListings, recentListings } })
     } catch (error) {
         console.log(error)
         res.status(500).json({ messsage: error.code || error.message })
@@ -187,7 +187,7 @@ export const changeCredential = async (req, res) => {
 
         await prisma.listing.update({
             where: { id: listingId },
-            data: { updatedCredetial: newCredential }
+            data: { isCredentialChanged:true}
         })
 
         return res.json({ message: "Credential changed successfully" })
