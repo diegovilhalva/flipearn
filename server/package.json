@@ -23,6 +23,8 @@
     "express": "^5.2.1",
     "inngest": "^3.47.0",
     "multer": "^2.0.2",
+    "nodemailer": "^7.0.11",
+    "stripe": "^20.1.0",
     "ws": "^8.18.3"
   },
   "devDependencies": {
