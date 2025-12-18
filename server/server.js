@@ -5,9 +5,12 @@ import { clerkMiddleware } from '@clerk/express'
 import { serve } from "inngest/express";
 import { inngest, functions } from "./inngest/index.js"
 import listingRoutes from "./routes/listing.route.js"
-import chatRoutes  from "./routes/chat.route.js"
+import chatRoutes from "./routes/chat.route.js"
 import adminRoutes from "./routes/admin.route.js"
+import { stripeWebhook } from "./controllers/stripe.webhook.js";
 const app = express()
+
+app.use("/api/stripe", express.raw({ type: "application/json" }),stripeWebhook)
 
 app.use(express.json())
 app.use(cors())
@@ -21,8 +24,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/inngest", serve({ client: inngest, functions }))
 app.use("/api/listing", listingRoutes)
-app.use("/api/chat",chatRoutes)
-app.use("/api/admin",adminRoutes)
+app.use("/api/chat", chatRoutes)
+app.use("/api/admin", adminRoutes)
 
 app.listen(4000, () => {
     console.log(`Server running on port: ${PORT}`)
